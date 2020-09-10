@@ -20,12 +20,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         GiphyService giphyService = GiphyServiceBuilder.build();
-        giphyService.searchGifs("cat", 9, GiphyService.API_KEY).enqueue(new Callback<GiphySearch>() {
+        giphyService.searchGifs(GiphyService.API_KEY).enqueue(new Callback<GiphySearch>() {
             @Override
             public void onResponse(@NonNull Call<GiphySearch> call, @NonNull Response<GiphySearch> response) {
                 GiphySearch giphySearch = response.body();
                 if (giphySearch != null) {
-                    Log.d("aaaaaaaaaa", String.valueOf(Objects.requireNonNull(giphySearch.data.get(0).images.get("original")).url));
+                    Log.d("aaaaaaaaaa", Objects.requireNonNull(giphySearch.data.images.get("original")).url);
                 }
             }
 
