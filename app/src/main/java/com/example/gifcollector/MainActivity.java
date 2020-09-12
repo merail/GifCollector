@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,9 +30,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.widget.AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL;
+
 public class MainActivity extends AppCompatActivity {
     private List<String> mGifUrls;
-    private RecyclerView mGifRecyclerView;
+    private GifsAdapter mGifsAdapter;
+    GiphyService mGiphyService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,31 +43,33 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mGifUrls = new ArrayList<>();
-        mGifRecyclerView = findViewById(R.id.gifRecyclerView);
+        RecyclerView mGifRecyclerView = findViewById(R.id.gifRecyclerView);
         mGifRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager gifManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
         mGifRecyclerView.setLayoutManager(gifManager);
-        final GifsAdapter gifsAdapter = new GifsAdapter();
-        mGifRecyclerView.setAdapter(gifsAdapter);
+        mGifsAdapter = new GifsAdapter();
+        mGifRecyclerView.setAdapter(mGifsAdapter);
 
-        GiphyService giphyService = GiphyServiceBuilder.build();
-        for(int i = 0;i < 50;i++)
-        giphyService.searchGifs(GiphyService.API_KEY).enqueue(new Callback<GiphySearch>() {
+        final Boolean[] isScrolled = {false};
+        mGifRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onResponse(@NonNull Call<GiphySearch> call, @NonNull Response<GiphySearch> response) {
-                GiphySearch giphySearch = response.body();
-                if (giphySearch != null) {
-                    Log.d("aaaaaaaaaa", Objects.requireNonNull(giphySearch.data.images.get("original")).url);
-                    mGifUrls.add(Objects.requireNonNull(giphySearch.data.images.get("original")).url);
-                    gifsAdapter.notifyDataSetChanged();
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (!recyclerView.canScrollVertically(-1)  && newState == RecyclerView.SCROLL_STATE_IDLE && !isScrolled[0]) {
+                    loadGifs();
                 }
+                isScrolled[0] = false;
             }
 
             @Override
-            public void onFailure(@NonNull Call<GiphySearch> call, @NonNull Throwable t) {
-                t.printStackTrace();
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                isScrolled[0] = true;
             }
         });
+
+        mGiphyService = GiphyServiceBuilder.build();
+        loadGifs();
     }
 
     public class GifsAdapter extends RecyclerView.Adapter<GifsAdapter.ViewHolder> {
@@ -116,6 +120,31 @@ public class MainActivity extends AppCompatActivity {
                 progressBar = itemView.findViewById(R.id.progress);
                 gif = itemView.findViewById(R.id.gif);
             }
+        }
+    }
+
+    public void loadGifs()
+    {
+        mGifUrls.clear();
+        mGifsAdapter.notifyDataSetChanged();
+
+        for(int i = 0;i < 50;i++)
+        {
+            mGiphyService.searchGifs(GiphyService.API_KEY).enqueue(new Callback<GiphySearch>() {
+                @Override
+                public void onResponse(@NonNull Call<GiphySearch> call, @NonNull Response<GiphySearch> response) {
+                    GiphySearch giphySearch = response.body();
+                    if (giphySearch != null) {
+                        mGifUrls.add(Objects.requireNonNull(giphySearch.data.images.get("original")).url);
+                        mGifsAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<GiphySearch> call, @NonNull Throwable t) {
+                    t.printStackTrace();
+                }
+            });
         }
     }
 }
