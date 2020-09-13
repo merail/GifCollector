@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("ClickableViewAccessibility")
         @Override
         public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
+            final Boolean[] is = {true};
 
             Glide.with(getApplicationContext())
                     .load(mGifUrls.get(position))
@@ -104,6 +106,31 @@ public class MainActivity extends AppCompatActivity {
                         }
                     })
                     .into(holder.gif);
+
+            holder.gif.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    holder.save.setVisibility(View.VISIBLE);
+                    is[0] = false;
+                    return false;
+                }
+            });
+
+            holder.gif.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(is[0])
+                        holder.save.setVisibility(View.INVISIBLE);
+                    is[0] = true;
+                }
+            });
+
+            holder.save.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
         }
 
         @Override
@@ -114,11 +141,13 @@ public class MainActivity extends AppCompatActivity {
         class ViewHolder extends RecyclerView.ViewHolder {
             private ProgressBar progressBar;
             private ImageView gif;
+            private ImageButton save;
 
             ViewHolder(View itemView) {
                 super(itemView);
                 progressBar = itemView.findViewById(R.id.progress);
                 gif = itemView.findViewById(R.id.gif);
+                save = itemView.findViewById(R.id.save);
             }
         }
     }
