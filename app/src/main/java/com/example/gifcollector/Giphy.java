@@ -8,7 +8,7 @@ public class Giphy {
     public String type;
     public Map<String, GiphyImage> images;
 
-    public class GiphyImage {
+    public static class GiphyImage {
         public String url;
         public int width;
         public int height;

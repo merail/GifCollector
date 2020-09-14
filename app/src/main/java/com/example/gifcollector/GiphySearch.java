@@ -7,7 +7,7 @@ public class GiphySearch {
     public Giphy data;
     public Meta meta;
 
-    class Meta {
+    static class Meta {
         public int status;
         public String msg;
         public String response_id;
