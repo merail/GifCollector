@@ -59,7 +59,7 @@ public class RandomActivity extends AppCompatActivity {
             }
         });
 
-        RecyclerView recyclerView = findViewById(R.id.gifRecyclerView);
+        RecyclerView recyclerView = findViewById(R.id.randomRecyclerView);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager manager = new GridLayoutManager(this, SPAN_COUNT, GridLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(manager);
