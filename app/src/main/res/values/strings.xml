@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GifCollector</string>
+    <string name="saved">saved</string>
 </resources>
