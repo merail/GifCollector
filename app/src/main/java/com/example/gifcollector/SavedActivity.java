@@ -1,7 +1,11 @@
 package com.example.gifcollector;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -26,6 +30,14 @@ public class SavedActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().getDecorView().setSystemUiVisibility(SYSTEM_UI_FLAGS);
 
+        ImageButton randomButton = findViewById(R.id.random);
+        randomButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
         List<String> mUrls = new ArrayList<>();
 
         String readCountOfSaved = Database.get(getApplicationContext()).readData("countOfSaved");
@@ -36,8 +48,8 @@ public class SavedActivity extends AppCompatActivity {
             countOfSaved = Integer.parseInt(readCountOfSaved);
 
         for (int i = 0; i < countOfSaved; i++)
-            mUrls.add(Database.get(getApplicationContext()).readData(String.valueOf(i)));
-
+        {mUrls.add(Database.get(getApplicationContext()).readData(String.valueOf(i)));
+        Log.d(String.valueOf(i), mUrls.get(i));}
         RecyclerView recyclerView = findViewById(R.id.gifRecyclerView);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager manager = new GridLayoutManager(this, SPAN_COUNT, GridLayoutManager.VERTICAL, false);

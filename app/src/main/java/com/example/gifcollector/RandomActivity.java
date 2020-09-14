@@ -51,14 +51,13 @@ public class RandomActivity extends AppCompatActivity {
             }
         });
 
-        Button savedButton = findViewById(R.id.saved);
+        ImageButton savedButton = findViewById(R.id.saved);
         savedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), SavedActivity.class));
             }
         });
-
 
         RecyclerView recyclerView = findViewById(R.id.gifRecyclerView);
         recyclerView.setHasFixedSize(true);

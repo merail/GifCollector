@@ -99,7 +99,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                 if (mMode.equals(RANDOM)) {
                     Database.get(mContext).deleteData("countOfSaved");
                     Database.get(mContext).writeData("countOfSaved", String.valueOf(countOfSaved + 1));
-                    Database.get(mContext).writeData(String.valueOf((countOfSaved + 1)), mUrls.get(position));
+                    Database.get(mContext).writeData(String.valueOf((countOfSaved)), mUrls.get(position));
                 } else {
                     if (countOfSaved != 0) {
                         Database.get(mContext).deleteData("countOfSaved");
