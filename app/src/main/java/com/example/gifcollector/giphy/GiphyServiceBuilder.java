@@ -1,4 +1,4 @@
-package com.example.gifcollector;
+package com.example.gifcollector.giphy;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;

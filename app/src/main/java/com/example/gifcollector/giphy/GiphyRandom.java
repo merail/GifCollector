@@ -1,8 +1,6 @@
-package com.example.gifcollector;
+package com.example.gifcollector.giphy;
 
-import java.util.List;
-
-public class GiphySearch {
+public class GiphyRandom {
 
     public Giphy data;
     public Meta meta;

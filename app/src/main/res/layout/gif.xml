@@ -26,7 +26,6 @@
         android:layout_marginStart="160dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/save"
         android:visibility="invisible" />
 
 </RelativeLayout>
