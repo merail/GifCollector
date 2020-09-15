@@ -48,8 +48,7 @@ public class SavedActivity extends AppCompatActivity {
             countOfSaved = Integer.parseInt(readCountOfSaved);
 
         for (int i = 0; i < countOfSaved; i++)
-        {mUrls.add(Database.get(getApplicationContext()).readData(String.valueOf(i)));
-        Log.d(String.valueOf(i), mUrls.get(i));}
+            mUrls.add(Database.get(getApplicationContext()).readData(String.valueOf(i)));
         RecyclerView recyclerView = findViewById(R.id.savedRecyclerView);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager manager = new GridLayoutManager(this, SPAN_COUNT, GridLayoutManager.VERTICAL, false);

@@ -70,6 +70,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             public boolean onLongClick(View view) {
                 holder.save.setVisibility(View.VISIBLE);
                 isNotLongClicked[0] = false;
+
                 return false;
             }
         });
@@ -79,7 +80,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             public void onClick(View view) {
                 if (isNotLongClicked[0])
                 {
-                    notifyDataSetChanged();
                     holder.save.setVisibility(View.INVISIBLE);
                 }
                 isNotLongClicked[0] = true;
@@ -96,17 +96,25 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                 else
                     countOfSaved = Integer.parseInt(readCountOfSaved);
 
+                Database.get(mContext).deleteData("countOfSaved");
+
                 if (mMode.equals(RANDOM)) {
-                    Database.get(mContext).deleteData("countOfSaved");
                     Database.get(mContext).writeData("countOfSaved", String.valueOf(countOfSaved + 1));
                     Database.get(mContext).writeData(String.valueOf((countOfSaved)), mUrls.get(position));
                 } else {
-                    if (countOfSaved != 0) {
-                        Database.get(mContext).deleteData("countOfSaved");
-                        Database.get(mContext).writeData("countOfSaved", String.valueOf(countOfSaved - 1));
-                        Database.get(mContext).deleteData(String.valueOf(countOfSaved));
+                    Database.get(mContext).deleteData(String.valueOf(position));
+                    for(int i = position;i < countOfSaved - 1;i++)
+                    {
+                        Database.get(mContext).writeData(String.valueOf(i), Database.get(mContext).readData(String.valueOf(i + 1)));
+                        Database.get(mContext).deleteData(String.valueOf(i + 1));
                     }
+                    Database.get(mContext).writeData("countOfSaved", String.valueOf(countOfSaved - 1));
+
+                    mUrls.remove(position);
+                    notifyItemRemoved(position);
                 }
+
+                holder.save.setVisibility(View.INVISIBLE);
             }
         });
     }
