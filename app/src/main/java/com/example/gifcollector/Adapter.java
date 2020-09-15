@@ -138,6 +138,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
             if (mode.equals(RANDOM))
                 save.setBackgroundResource(R.drawable.save);
+            else
+                save.setBackgroundResource(R.drawable.delete);
         }
     }
 }
