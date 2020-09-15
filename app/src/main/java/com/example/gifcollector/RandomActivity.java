@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.example.gifcollector.giphy.GiphyRandom;
@@ -30,7 +30,9 @@ import static com.example.gifcollector.Utils.SYSTEM_UI_FLAGS;
 
 public class RandomActivity extends AppCompatActivity {
     private List<String> mUrls;
+    RecyclerView mRecyclerView;
     private Adapter mAdapter;
+    boolean mIsLoading = false;
     private GiphyService mGiphyService;
 
     @Override
@@ -47,7 +49,7 @@ public class RandomActivity extends AppCompatActivity {
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadGifs();
+                loadGifs(true);
             }
         });
 
@@ -59,20 +61,20 @@ public class RandomActivity extends AppCompatActivity {
             }
         });
 
-        RecyclerView recyclerView = findViewById(R.id.randomRecyclerView);
-        recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager manager = new GridLayoutManager(this, SPAN_COUNT, GridLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(manager);
+        mRecyclerView = findViewById(R.id.randomRecyclerView);
+        mRecyclerView.setHasFixedSize(true);
+        final GridLayoutManager manager = new GridLayoutManager(this, SPAN_COUNT, GridLayoutManager.VERTICAL, false);
+        mRecyclerView.setLayoutManager(manager);
         mAdapter = new Adapter(getApplicationContext(), mUrls, RANDOM);
-        recyclerView.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(mAdapter);
 
         final Boolean[] isScrolled = {false};
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (!recyclerView.canScrollVertically(-1)  && newState == RecyclerView.SCROLL_STATE_IDLE && !isScrolled[0]) {
-                    loadGifs();
+                    loadGifs(true);
                 }
                 isScrolled[0] = false;
             }
@@ -81,19 +83,26 @@ public class RandomActivity extends AppCompatActivity {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 isScrolled[0] = true;
+
+                if (!mIsLoading) {
+                    if (manager.findLastCompletelyVisibleItemPosition() == mUrls.size() - 1) {
+                        loadMore();
+                        mIsLoading = true;
+                    }
+                }
             }
         });
 
         mGiphyService = GiphyServiceBuilder.build();
-        loadGifs();
+        loadGifs(false);
     }
 
-    public void loadGifs()
+    public void loadGifs(Boolean needToClear)
     {
-        mUrls.clear();
-        mAdapter.notifyDataSetChanged();
+        if(needToClear)
+            mUrls.clear();
 
-        for(int i = 0;i < 50;i++)
+        for(int i = 0;i < 20;i++)
         {
             mGiphyService.getRandomGif(GiphyService.API_KEY).enqueue(new Callback<GiphyRandom>() {
                 @Override
@@ -111,5 +120,26 @@ public class RandomActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void loadMore() {
+        mUrls.add(null);
+        mAdapter.notifyItemInserted(mUrls.size() - 1);
+
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mUrls.remove(mUrls.size() - 1);
+                int scrollPosition = mUrls.size();
+                mAdapter.notifyItemRemoved(scrollPosition);
+
+                loadGifs(false);
+
+                mAdapter.notifyDataSetChanged();
+                mIsLoading = false;
+            }
+        }, 100);
     }
 }
